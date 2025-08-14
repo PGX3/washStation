@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3306
--- Tempo de geração: 14/08/2025 às 18:27
+-- Tempo de geração: 14/08/2025 às 18:34
 -- Versão do servidor: 8.2.0
 -- Versão do PHP: 8.2.13
 
@@ -49,6 +49,7 @@ CREATE TABLE IF NOT EXISTS `companies` (
 DROP TABLE IF EXISTS `employees`;
 CREATE TABLE IF NOT EXISTS `employees` (
   `id` int NOT NULL AUTO_INCREMENT,
+  `company_id` int DEFAULT NULL,
   `name` varchar(100) NOT NULL,
   `phone` varchar(30) DEFAULT NULL,
   `hire_date` date DEFAULT NULL,
@@ -58,7 +59,8 @@ CREATE TABLE IF NOT EXISTS `employees` (
   `fixed_amount_per_wash` decimal(10,2) DEFAULT '0.00',
   `monthly_salary` decimal(10,2) DEFAULT '0.00',
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  KEY `company_id` (`company_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- --------------------------------------------------------
@@ -70,12 +72,35 @@ CREATE TABLE IF NOT EXISTS `employees` (
 DROP TABLE IF EXISTS `payments`;
 CREATE TABLE IF NOT EXISTS `payments` (
   `id` int NOT NULL AUTO_INCREMENT,
+  `company_id` int DEFAULT NULL,
   `wash_id` int NOT NULL,
   `amount_paid` decimal(10,2) NOT NULL,
   `payment_method` enum('Cartao','Dinheiro','Pix') DEFAULT NULL,
   `paid_at` datetime DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
-  KEY `wash_id` (`wash_id`)
+  KEY `wash_id` (`wash_id`),
+  KEY `company_id` (`company_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura para tabela `users`
+--
+
+DROP TABLE IF EXISTS `users`;
+CREATE TABLE IF NOT EXISTS `users` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `name` varchar(150) NOT NULL,
+  `email` varchar(150) NOT NULL,
+  `password` varchar(255) NOT NULL,
+  `company_id` int NOT NULL,
+  `role` enum('admin','funcionario') DEFAULT 'funcionario',
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `email` (`email`),
+  KEY `company_id` (`company_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- --------------------------------------------------------
@@ -87,6 +112,7 @@ CREATE TABLE IF NOT EXISTS `payments` (
 DROP TABLE IF EXISTS `washes`;
 CREATE TABLE IF NOT EXISTS `washes` (
   `id` int NOT NULL AUTO_INCREMENT,
+  `company_id` int DEFAULT NULL,
   `schedule_at` datetime NOT NULL,
   `customer_name` varchar(100) DEFAULT NULL,
   `wash_type_id` int NOT NULL,
@@ -97,7 +123,8 @@ CREATE TABLE IF NOT EXISTS `washes` (
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY `wash_type_id` (`wash_type_id`),
-  KEY `employee_id` (`employee_id`)
+  KEY `employee_id` (`employee_id`),
+  KEY `company_id` (`company_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- --------------------------------------------------------
@@ -109,10 +136,12 @@ CREATE TABLE IF NOT EXISTS `washes` (
 DROP TABLE IF EXISTS `wash_types`;
 CREATE TABLE IF NOT EXISTS `wash_types` (
   `id` int NOT NULL AUTO_INCREMENT,
+  `company_id` int DEFAULT NULL,
   `name` varchar(50) NOT NULL,
   `default_price` decimal(10,2) DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  KEY `company_id` (`company_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 COMMIT;
 
